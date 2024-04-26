@@ -7,7 +7,7 @@ Created on Fri Nov 25 10:04:14 2022
 """ 
 
 from sigfig  import round
-from math    import floor, log10
+from math    import floor, log10, atan, sqrt, pi
 from anytree import Node, RenderTree
 
 import os
@@ -760,18 +760,19 @@ def df_to_csv(df,
         file.write(filedata)
 
 
-def read_csv(path,squeeze=False):
+def read_csv(path,squeeze=False, rm_space=True, dtype=None):
     
     df = pd.read_csv(path,
                      parse_dates=True,
                      squeeze=squeeze,
-                     index_col=0)
+                     index_col=0,
+                     dtype=dtype    )
 
 
-    if "Serie" not in str(type(df)):
+    if "Serie" not in str(type(df)) and rm_space:
 
         df.columns = [ c.replace(' ','') for c in list(df.columns)]
-
+   
         # if df.index.name != None:
         #     index_name = df.index.name.replace(' ','')
 
@@ -801,3 +802,98 @@ def print_log(path_log, content, mode='a'):
         f.write(content)
 
     print(content)
+
+
+
+
+def ovdir(psdx, psdy, wave_dir):
+
+    Ax  = sqrt(psdx)
+    Ay  = sqrt(psdy)
+
+    ang = atan(Ax/Ay) * 180/pi
+
+
+    if wave_dir < 60 or  330 <= wave_dir:
+
+        vib_dir = 240 - ang
+
+
+    elif 60 <= wave_dir < 150:
+
+        vib_dir = 240 + ang
+    
+    elif 150 <= wave_dir < 240:
+
+        vib_dir = 60 - ang
+
+    elif 240 <= wave_dir < 330:
+
+        vib_dir = 60 + ang
+
+
+    opp_vib_dir = (vib_dir - 180)%360
+
+    # print("wave_dir = ", wave_dir)
+    # print("nf1 vibration direction =", vib_dir)
+
+    # print("\nnf1 opposed vibration direction =")
+    
+    return opp_vib_dir
+
+
+
+def rotdir_nf1(ASX_am, ASY_am, wave_dir):
+
+    Ax  = ASX_am
+    Ay  = ASY_am
+
+    ang = atan(Ax/Ay) * 180/pi
+
+
+    if 330 <= wave_dir or wave_dir < 60 :
+
+        rot_dir = 150 - ang
+
+    elif 60  <= wave_dir < 150 :
+
+        rot_dir = 150 + ang 
+
+    elif 150 <= wave_dir < 240 :
+
+        rot_dir = 330 - ang
+
+    elif 240 <= wave_dir < 330 : 
+
+        rot_dir = ( 330 + ang ) % 360
+
+
+    return rot_dir
+
+
+
+
+def oadir(Xi, Yi):
+
+    theX =  30   * pi/180
+    theY =  120  * pi/180
+
+    if Yi == 0 :
+
+        theta = theY - np.sign(Xi)*pi/2
+
+    if Yi  > 0 :
+
+        theta = theY - atan(Xi/Yi)
+
+    if Yi  < 0 : 
+
+        theta = theX - pi/2 - atan(Xi/Yi)
+
+    avg_dir = - theta*180/np.pi%360 
+
+
+    opp_avg_dir = (avg_dir + 180)%360
+
+    
+    return opp_avg_dir
