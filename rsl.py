@@ -6,15 +6,19 @@ Created on Fri Nov 25 10:04:14 2022
 @author: roussela
 """ 
 
-from sigfig  import round
-from math    import floor, log10, atan, sqrt, pi
-from anytree import Node, RenderTree
+from sigfig                 import round
+from math                   import floor, log10, atan, sqrt, pi
+from anytree                import Node, RenderTree
+from matplotlib.collections import PatchCollection
 
 import os
 
 import pprint
 import numpy  as np
 import pandas as pd
+
+import matplotlib.patches as patches
+import matplotlib.pyplot  as plt
 
 
 pp = pprint.PrettyPrinter().pprint
@@ -707,13 +711,16 @@ def df_to_csv(df,
 
     if align_col:
 
+        if len_str < 10 and sig_fig==4:
+            print("WARNING: rsl.py:690 df_to_csv : len_str and sig_fig not compatible")
+
         col = list(df.columns)
 
         for i in range(len(col)):
 
-            if len(col[i]) < 10:
+            if len(col[i]) < len_str:
 
-                col[i] += (10-len(col[i]))*' ' 
+                col[i] += (len_str-len(col[i]))*' ' 
 
 
         df.columns = col
@@ -897,3 +904,50 @@ def oadir(Xi, Yi):
 
     
     return opp_avg_dir
+
+
+
+
+
+
+def arrow_circ_h(ax,center, radius, facecolor='#2693de', edgecolor='#000000', theta1=0, theta2=200):
+   
+   # Add the ring
+   rwidth = 0.002
+   ring = patches.Wedge(center, radius, theta1, theta2, width=rwidth)
+   # Triangle edges
+   offset = 0.006
+   xcent  = center[0] + radius - (rwidth/2)
+   left   = [xcent - offset, center[1]]
+   right  = [xcent + offset, center[1]]
+   bottom = [(left[0]+right[0])/2., center[1]-0.015]
+   arrow  = plt.Polygon([left, right, bottom, left])
+   p = PatchCollection(
+       [ring, arrow], 
+       edgecolor = edgecolor, 
+       facecolor = facecolor,
+   )
+   ax.add_collection(p)
+
+
+def arrow_circ_v(ax,center, radius, facecolor='#2693de', edgecolor='#000000', theta1=-30, theta2=180):
+   
+   # Add the ring
+   rwidth = 0.002
+   ring = patches.Wedge(center, radius, theta1, theta2, width=rwidth)
+   # Triangle edges
+   offset = 0.006
+   # xcent  = center[0] - radius + (rwidth/2)
+   ycent  = center[1] - radius + (rwidth/2)
+   # left   = [xcent - offset, center[1]]
+   left   = [center[0], ycent - offset, ]
+   # right  = [xcent + offset, center[1]]
+   right  = [center[0], ycent+offset]
+   bottom = [ center[0]-0.015, (left[1]+right[1])/2.]
+   arrow  = plt.Polygon([left, right, bottom, left])
+   p = PatchCollection(
+       [ring, arrow], 
+       edgecolor = edgecolor, 
+       facecolor = facecolor,
+   )
+   ax.add_collection(p)
