@@ -694,6 +694,8 @@ def df_to_csv(df,
               resolution=4,
               align_col=False):
     
+
+
     if "DataFrame" not in str(type(df)):
         if "Series" not in str(type(df)):
             raise ValueError("df should be a DataFrame or Series")
@@ -791,6 +793,20 @@ def read_csv(path,squeeze=False, rm_space=True, dtype=None):
 
 
     return df
+
+
+def read_arr(path):
+
+    df = pd.read_csv(path,
+                     header=None)
+
+    array = df.to_numpy()
+
+    if len(array.shape) == 2 and array.shape[1] ==1:
+
+        array = array.reshape( (array.shape[0],) )
+
+    return array
 
 
 
