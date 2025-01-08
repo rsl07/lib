@@ -12,6 +12,7 @@ from anytree                import Node, RenderTree
 from matplotlib.collections import PatchCollection
 
 import os
+import ipdb 
 
 import pprint
 import numpy  as np
@@ -687,6 +688,70 @@ def arr_to_csv(arr, path="/home/d51680/array.csv",
               header = False )
 
 
+    ### tag : ¬complex_arr ###
+
+
+    if 'complex' in str(arr.dtype):
+
+
+        zero_lim = 1e-4 
+
+
+
+        with open(path,'w') as file:
+
+            if len(arr.shape)==1 :
+
+                for i in range(0,arr.shape[0]):
+
+
+                    if abs(arr[i]) == np.inf:
+
+                        str_numb = " inf*"+str(np.sign(arr[i]))+" "*(14-len(str(np.sign(arr[i]))))+',\n'
+
+
+
+
+                    elif arr[i].imag >= 0 and arr[i].real >= 0 :
+
+                        str_numb = " "+"{:.2e}".format(arr[i].real)+"+"+"{:.2e}".format(arr[i].imag)+"j,\n"
+
+                    elif arr[i].imag >= 0 and arr[i].real < 0 :
+
+                        str_numb = "{:.2e}".format(arr[i].real)+"+"+"{:.2e}".format(arr[i].imag)+"j,\n"
+
+                    elif arr[i].imag < 0 and arr[i].real >= 0 :
+
+                        str_numb = " "+"{:.2e}".format(arr[i].real)+"{:.2e}".format(arr[i].imag)+"j,\n"
+
+                    elif arr[i].imag < 0 and arr[i].real < 0 :
+
+                        str_numb = "{:.2e}".format(arr[i].real)+"{:.2e}".format(arr[i].imag)+"j,\n"
+
+
+
+                    str_numb=str_numb.replace("0.00e+00j" ,"0j       ")
+                    str_numb=str_numb.replace("0.00e+00","0       ")
+
+
+                    file.write(str_numb)
+
+
+
+
+
+
+        # with open(path) as path:
+
+        #     for j in range(0,arr.shape[1])
+
+
+
+
+
+
+
+
 def df_to_csv(df,
               path="/home/d51680/df.csv",
               sig_fig=4, 
@@ -755,6 +820,8 @@ def df_to_csv(df,
                                              resolution=resolution,
                                              len_str=len_str)      
               )
+
+
 
     # --------------------------------------------------------------------------
     # replace NaN with empty string 10 character long
