@@ -691,11 +691,12 @@ def arr_to_csv(arr, path="/home/d51680/array.csv",
     ### tag : ¬complex_arr ###
 
 
+
+
     if 'complex' in str(arr.dtype):
 
-
-        zero_lim = 1e-4 
-
+        lim_zero = 1e-6
+        lim_inf  = 1e10
 
 
         with open(path,'w') as file:
@@ -704,50 +705,74 @@ def arr_to_csv(arr, path="/home/d51680/array.csv",
 
                 for i in range(0,arr.shape[0]):
 
+                    str_numb = complex_to_str(arr[i], lim_zero, lim_inf)
 
-                    if abs(arr[i]) == np.inf:
-
-                        str_numb = " inf*"+str(np.sign(arr[i]))+" "*(14-len(str(np.sign(arr[i]))))+',\n'
-
+                    file.write(str_numb+",\n")
 
 
+            elif len(arr.shape)==2:
 
-                    elif arr[i].imag >= 0 and arr[i].real >= 0 :
+                for i in range(0, arr.shape[0]):
 
-                        str_numb = " "+"{:.2e}".format(arr[i].real)+"+"+"{:.2e}".format(arr[i].imag)+"j,\n"
+                    for j in range(0,arr.shape[1]):
 
-                    elif arr[i].imag >= 0 and arr[i].real < 0 :
+                        str_numb = complex_to_str(arr[i,j], lim_zero, lim_inf)
 
-                        str_numb = "{:.2e}".format(arr[i].real)+"+"+"{:.2e}".format(arr[i].imag)+"j,\n"
+                        file.write(str_numb+',')
 
-                    elif arr[i].imag < 0 and arr[i].real >= 0 :
-
-                        str_numb = " "+"{:.2e}".format(arr[i].real)+"{:.2e}".format(arr[i].imag)+"j,\n"
-
-                    elif arr[i].imag < 0 and arr[i].real < 0 :
-
-                        str_numb = "{:.2e}".format(arr[i].real)+"{:.2e}".format(arr[i].imag)+"j,\n"
+                    file.write('\n')
 
 
 
-                    str_numb=str_numb.replace("0.00e+00j" ,"0j       ")
-                    str_numb=str_numb.replace("0.00e+00","0       ")
+def complex_to_str(z,lim_zero,lim_inf):
 
+    if abs(z.real) < lim_zero:
+        z = 0 + z.imag*1j
 
-                    file.write(str_numb)
-
-
-
-
-
-
-        # with open(path) as path:
-
-        #     for j in range(0,arr.shape[1])
+    if abs(z.imag) < lim_zero:
+        z = z.real + 0j
 
 
 
+    if abs(z)      > lim_inf:
 
+        if abs(z.real) > abs(z.imag) :
+
+            if z.real > 0 : str_z = ' inf               '
+            if z.real < 0 : str_z = '-inf               '
+
+        else :
+
+            if z.imag > 0 : str_z = '         +infj     '
+            if z.imag < 0 : str_z = '         -infj     '
+
+    elif z.imag >= 0 and z.real >= 0 :
+
+        str_z = " "+"{:.2e}".format(z.real)+"+"+"{:.2e}".format(z.imag)+"j"
+
+    elif z.imag >= 0 and z.real < 0 :
+
+        str_z = "{:.2e}".format(z.real)+"+"+"{:.2e}".format(z.imag)+"j"
+
+    elif z.imag < 0 and z.real >= 0 :
+
+        str_z = " "+"{:.2e}".format(z.real)+"{:.2e}".format(z.imag)+"j"
+
+    elif z.imag < 0 and z.real < 0 :
+
+        str_z = "{:.2e}".format(z.real)+"{:.2e}".format(z.imag)+"j"
+
+
+    str_z = str_z.replace("+0.00e+00j" ,"          ")
+    str_z = str_z.replace("-0.00e+00j" ,"          ")
+
+    str_z = str_z.replace("0.00e+00","0       ")
+
+    str_z = str_z.replace("0       +","         ")
+    str_z = str_z.replace("0       -","        -")
+
+
+    return str_z
 
 
 
