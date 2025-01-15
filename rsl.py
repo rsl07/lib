@@ -695,7 +695,7 @@ def arr_to_csv(arr, path="/home/d51680/array.csv",
 
     if 'complex' in str(arr.dtype):
 
-        lim_zero = 1e-6
+        lim_zero = 1e-10
         lim_inf  = 1e10
 
 
