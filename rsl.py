@@ -671,7 +671,8 @@ def locals_object(dict_loc):
 
 
 def arr_to_csv(arr, path="/home/d51680/array.csv",
-               neg_space=True, sig_fig=3, len_str=9):
+               neg_space=True, sig_fig=3, len_str=9,
+               lim_zero = 1e-10, lim_inf = 1e10 ):
     
     if "array" not in str(type(arr)):
         raise ValueError("arr should be an array")
@@ -694,10 +695,6 @@ def arr_to_csv(arr, path="/home/d51680/array.csv",
 
 
     if 'complex' in str(arr.dtype):
-
-        lim_zero = 1e-10
-        lim_inf  = 1e10
-
 
         with open(path,'w') as file:
 
